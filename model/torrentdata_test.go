@@ -1,40 +1,26 @@
-package torrentfile
+package torrentdata
 
 import (
 	"errors"
-	"io"
 	"os"
 	"testing"
 )
 
-type MockFile struct {
-	data []byte
-}
-
-// Read reads data from the mock file.
-func (f *MockFile) Read(p []byte) (n int, err error) {
-	return copy(p, f.data), io.EOF
-}
-
-var bencodeUnmarshal = func(r io.Reader, v interface{}) error {
-	return nil // Default behavior: return no error
-}
-
 func TestOpen(t *testing.T) {
 	t.Run("ValidFile", func(t *testing.T) {
-		torrentFile, err := Open("testdata/archlinux-2019.12.01-x86_64.iso.torrent")
+		metainfoFile, err := Open("testdata/archlinux-2019.12.01-x86_64.iso.torrent")
 		if err != nil {
 			t.Fatalf("Open failed: %v", err)
 		}
 
 		expectedAnnounce := "http://tracker.archlinux.org:6969/announce"
-		if torrentFile.Announce != expectedAnnounce {
-			t.Errorf("Unexpected Announce value: got %q, want %q", torrentFile.Announce, expectedAnnounce)
+		if metainfoFile.Announce != expectedAnnounce {
+			t.Errorf("Unexpected Announce value: got %q, want %q", metainfoFile.Announce, expectedAnnounce)
 		}
 
-		expectedComment := "archlinux-2019.12.01-x86_64.iso"
-		if torrentFile.Info.Name != expectedComment {
-			t.Errorf("Unexpected Comment value: got %q, want %q", torrentFile.Info.Name, expectedComment)
+		expectedInfoName := "archlinux-2019.12.01-x86_64.iso"
+		if metainfoFile.Info.Name != expectedInfoName {
+			t.Errorf("Unexpected Comment value: got %q, want %q", metainfoFile.Info.Name, expectedInfoName)
 		}
 	})
 
