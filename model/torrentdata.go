@@ -5,7 +5,9 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
+	"strconv"
 
 	"github.com/jackpal/bencode-go"
 )
@@ -98,4 +100,26 @@ func (metainfoFile *MetainfoFile) toTorrentData() (TorrentData, error) {
 		Name:        metainfoFile.Info.Name,
 	}
 	return t, nil
+}
+
+func (t *TorrentData) buildTrackerURL(peerID [20]byte, port uint16) (string, error) {
+	baseURL, err := url.Parse(t.Announce)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse announce URL: %v", err)
+	}
+
+	queryParams := url.Values{}
+	queryParams.Set("info_hash", string(t.InfoHash[:]))
+	peerIDString := string(peerID[:])
+	queryParams.Set("peer_id", peerIDString)
+	portString := strconv.Itoa(int(port))
+	queryParams.Set("port", portString)
+	queryParams.Set("uploaded", "0")
+	queryParams.Set("downloaded", "0")
+	queryParams.Set("compact", "1")
+	queryParams.Set("left", strconv.Itoa(t.Length))
+
+	baseURL.RawQuery = queryParams.Encode()
+
+	return baseURL.String(), nil
 }
