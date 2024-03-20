@@ -158,7 +158,7 @@ func TestBuildTrackerURL(t *testing.T) {
 		_, err := torrentData.buildTrackerURL(peerID, port)
 		if err == nil {
 			t.Error("Expected error, got nil")
-		} else if err.Error() != "failed to parse announce URL: parse \":)\": missing protocol scheme" {
+		} else if err.Error() != "torrentdata: failed to parse announce URL: parse \":)\": missing protocol scheme" {
 			t.Errorf("Unexpected error message: got %q, want %q", err.Error(), "torrentdata: failed to parse announce URL: parse \":)\": missing protocol scheme")
 		}
 	})
