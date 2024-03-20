@@ -105,7 +105,7 @@ func (metainfoFile *MetainfoFile) toTorrentData() (TorrentData, error) {
 func (t *TorrentData) buildTrackerURL(peerID [20]byte, port uint16) (string, error) {
 	baseURL, err := url.Parse(t.Announce)
 	if err != nil {
-		return "", fmt.Errorf("failed to parse announce URL: %v", err)
+		return "", fmt.Errorf("torrentdata: failed to parse announce URL: %v", err)
 	}
 
 	queryParams := url.Values{}
