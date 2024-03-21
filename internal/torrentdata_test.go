@@ -1,4 +1,4 @@
-package torrentdata
+package internal
 
 import (
 	"bytes"
