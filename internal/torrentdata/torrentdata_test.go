@@ -10,7 +10,7 @@ import (
 
 func TestOpen(t *testing.T) {
 	t.Run("ValidFile", func(t *testing.T) {
-		metainfoFile, err := Open("../test/data/archlinux-2019.12.01-x86_64.iso.torrent")
+		metainfoFile, err := Open("../../test/data/archlinux-2019.12.01-x86_64.iso.torrent")
 		if err != nil {
 			t.Fatalf("Open failed: %v", err)
 		}
