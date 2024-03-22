@@ -1,4 +1,4 @@
-module gotorrent
+module github.com/mattheworford/gotorrent
 
 go 1.21.6
 
