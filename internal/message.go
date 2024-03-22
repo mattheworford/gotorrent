@@ -10,6 +10,7 @@ import (
 type MessageType uint8
 
 const (
+	MaxPayloadLength             = 1 << 14
 	MsgChoke         MessageType = iota // 0
 	MsgUnchoke                          // 1
 	MsgInterested                       // 2
@@ -19,18 +20,15 @@ const (
 	MsgRequest                          // 6
 	MsgPiece                            // 7
 	MsgCancel                           // 8
-	MaxPayloadLength = 1 << 14
 )
 
-// PeerMessage stores ID and payload of a message
+// PeerMessage stores ID and payload of a message.
 type PeerMessage struct {
 	Type    MessageType
 	Payload []byte
 }
 
-// Serialize serializes a message into a buffer of the form
-// <length prefix><message ID><payload>
-// Interprets `nil` as a keep-alive message
+// Serialize serializes a message into a buffer of the form.
 func (m *PeerMessage) Serialize() ([]byte, error) {
 	if m == nil {
 		return make([]byte, 4), nil
@@ -49,8 +47,8 @@ func (m *PeerMessage) Serialize() ([]byte, error) {
 	return buf, nil
 }
 
-// Read reads a message from a stream
-func Read(r io.Reader) (*PeerMessage, error) {
+// ParsePeerMessage reads a message from a stream
+func ParsePeerMessage(r io.Reader) (*PeerMessage, error) {
 	lengthBuf := make([]byte, 4)
 	_, err := io.ReadFull(r, lengthBuf)
 	if err != nil {
@@ -58,7 +56,6 @@ func Read(r io.Reader) (*PeerMessage, error) {
 	}
 
 	length := binary.BigEndian.Uint32(lengthBuf)
-
 	if length == 0 {
 		return nil, nil
 	}
