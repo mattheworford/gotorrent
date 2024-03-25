@@ -38,14 +38,14 @@ func TestParsePeerMessage(t *testing.T) {
 			reader:        bytes.NewReader(bytes.Repeat([]byte{0x0A}, 4)),
 			expected:      nil,
 			expectErr:     true,
-			expectedError: errors.New("message length exceeds maximum allowed"),
+			expectedError: errors.New("message length 168430090 exceeds maximum allowed"),
 		},
 		{
 			name:          "ReadError",
 			reader:        &errorReader{},
 			expected:      nil,
 			expectErr:     true,
-			expectedError: errors.New("read error"),
+			expectedError: errors.New("failed to read message length: read error"),
 		},
 	}
 
@@ -111,7 +111,7 @@ func TestSerializePeerMessage(t *testing.T) {
 			},
 			expected:      nil,
 			expectErr:     true,
-			expectedError: errors.New("payload length exceeds maximum allowed"),
+			expectedError: errors.New("payload length 16385 exceeds maximum allowed"),
 		},
 	}
 

@@ -33,7 +33,7 @@ func TestDecodeConnectionInfo(t *testing.T) {
 			peerData:   []byte{192, 168, 0, 1, 0, 80, 192, 168, 0, 2},
 			expected:   nil,
 			expectErr:  true,
-			errMessage: "malformed peer data: incorrect size",
+			errMessage: "malformed connection data: incorrect size",
 		},
 	}
 
