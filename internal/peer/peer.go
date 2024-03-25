@@ -4,8 +4,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"net"
-
-	"github.com/mattheworford/gotorrent/internal/message"
 )
 
 const (
@@ -13,44 +11,35 @@ const (
 	portOffset = 4
 )
 
-// ConnectionInfo represents connection information for a peer.
-type ConnectionInfo struct {
+// Peer represents connection information for a peer.
+type Peer struct {
 	IP   net.IP
 	Port uint16
 }
 
-type Client struct {
-	Conn           net.Conn
-	Choked         bool
-	Bitfield       message.Bitfield
-	ConnectionInfo ConnectionInfo
-	InfoHash       [20]byte
-	PeerID         [20]byte
-}
-
-// DecodeConnectionInfo parses peer IP addresses and ports from binary data.
-func DecodeConnectionInfo(peerData []byte) ([]ConnectionInfo, error) {
+// DecodePeers parses peer IP addresses and ports from binary data.
+func DecodePeers(peerData []byte) ([]Peer, error) {
 	if peerData == nil {
 		return nil, errors.New("input data is nil")
 	}
 
 	if len(peerData)%peerSize != 0 {
-		return nil, errors.New("malformed connection data: incorrect size")
+		return nil, errors.New("malformed peer data: incorrect size")
 	}
 
 	numPeers := len(peerData) / peerSize
-	peers := make([]ConnectionInfo, numPeers)
+	peers := make([]Peer, numPeers)
 
 	for i := 0; i < numPeers; i++ {
 		offset := i * peerSize
 		ip := net.IPv4(peerData[offset], peerData[offset+1], peerData[offset+2], peerData[offset+3])
 		port := binary.BigEndian.Uint16(peerData[offset+portOffset : offset+peerSize])
 
-		connectionInfo := ConnectionInfo{
+		peer := Peer{
 			IP:   ip,
 			Port: port,
 		}
-		peers[i] = connectionInfo
+		peers[i] = peer
 	}
 
 	return peers, nil
