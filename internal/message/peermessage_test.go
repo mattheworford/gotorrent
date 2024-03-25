@@ -87,10 +87,10 @@ func TestSerializePeerMessage(t *testing.T) {
 		expectedError error
 	}{
 		{
-			name: "NilMessage",
-			message: nil,
-			expected: []byte{0x00, 0x00, 0x00, 0x00},
-			expectErr: false,
+			name:          "NilMessage",
+			message:       nil,
+			expected:      []byte{0x00, 0x00, 0x00, 0x00},
+			expectErr:     false,
 			expectedError: nil,
 		},
 		{
@@ -99,8 +99,8 @@ func TestSerializePeerMessage(t *testing.T) {
 				Type:    PeerMessageType(0x01),
 				Payload: []byte{0x02, 0x03, 0x04, 0x05},
 			},
-			expected: []byte{0x00, 0x00, 0x00, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05},
-			expectErr: false,
+			expected:      []byte{0x00, 0x00, 0x00, 0x05, 0x01, 0x02, 0x03, 0x04, 0x05},
+			expectErr:     false,
 			expectedError: nil,
 		},
 		{
@@ -109,8 +109,8 @@ func TestSerializePeerMessage(t *testing.T) {
 				Type:    PeerMessageType(0x01),
 				Payload: make([]byte, MaxPayloadLength+1),
 			},
-			expected: nil,
-			expectErr: true,
+			expected:      nil,
+			expectErr:     true,
 			expectedError: errors.New("payload length exceeds maximum allowed"),
 		},
 	}

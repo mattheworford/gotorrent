@@ -10,16 +10,16 @@ import (
 type PeerMessageType uint8
 
 const (
-	MaxPayloadLength             = 1 << 14
+	MaxPayloadLength                 = 1 << 14
 	MsgChoke         PeerMessageType = iota // 0
-	MsgUnchoke                          // 1
-	MsgInterested                       // 2
-	MsgNotInterested                    // 3
-	MsgHave                             // 4
-	MsgBitfield                         // 5
-	MsgRequest                          // 6
-	MsgPiece                            // 7
-	MsgCancel                           // 8
+	MsgUnchoke                              // 1
+	MsgInterested                           // 2
+	MsgNotInterested                        // 3
+	MsgHave                                 // 4
+	MsgBitfield                             // 5
+	MsgRequest                              // 6
+	MsgPiece                                // 7
+	MsgCancel                               // 8
 )
 
 // PeerMessage stores ID and payload of a message.
