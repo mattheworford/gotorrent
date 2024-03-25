@@ -6,18 +6,18 @@ import (
 	"testing"
 )
 
-func TestDecodePeers(t *testing.T) {
+func TestDecodeConnectionInfo(t *testing.T) {
 	testCases := []struct {
 		name       string
 		peerData   []byte
-		expected   []Peer
+		expected   []ConnectionInfo
 		expectErr  bool
 		errMessage string
 	}{
 		{
 			name:       "ValidPeerData",
 			peerData:   []byte{192, 168, 0, 1, 0, 80, 192, 168, 0, 2, 0, 81},
-			expected:   []Peer{{IP: net.IPv4(192, 168, 0, 1), Port: 80}, {IP: net.IPv4(192, 168, 0, 2), Port: 81}},
+			expected:   []ConnectionInfo{{IP: net.IPv4(192, 168, 0, 1), Port: 80}, {IP: net.IPv4(192, 168, 0, 2), Port: 81}},
 			expectErr:  false,
 			errMessage: "",
 		},
@@ -39,7 +39,7 @@ func TestDecodePeers(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			peers, err := DecodePeers(tc.peerData)
+			peers, err := DecodeConnectionInfo(tc.peerData)
 
 			if tc.expectErr {
 				if err == nil {
