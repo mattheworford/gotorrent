@@ -2,28 +2,28 @@ package message
 
 import "errors"
 
-// Bitfield represents the pieces that a peer has
+const BitsPerByte = 8
+
+// Bitfield represents the pieces that a peer has.
 type Bitfield []byte
 
-const bitsPerByte = 8
-
-// HasPiece tells if a bitfield has a particular index set
+// HasPiece tells if the bit at a given index is set.
 func (bf Bitfield) HasPiece(index int) bool {
-	if index < 0 || index >= len(bf)*bitsPerByte {
+	if index < 0 || index >= len(bf)*BitsPerByte {
 		return false
 	}
-	byteIndex := index / bitsPerByte
-	offset := index % bitsPerByte
+	byteIndex := index / BitsPerByte
+	offset := index % BitsPerByte
 	return bf[byteIndex]>>(7-offset)&1 != 0
 }
 
-// SetPiece sets a bit in the bitfield and returns a new bitfield
+// SetPiece returns a copy of the bitfield with the bit at the given index set.
 func (bf Bitfield) SetPiece(index int) (Bitfield, error) {
-	if index < 0 || index >= len(bf)*bitsPerByte {
+	if index < 0 || index >= len(bf)*BitsPerByte {
 		return nil, errors.New("index out of range")
 	}
-	byteIndex := index / bitsPerByte
-	offset := index % bitsPerByte
+	byteIndex := index / BitsPerByte
+	offset := index % BitsPerByte
 	copyOfBf := make(Bitfield, len(bf))
 	copy(copyOfBf, bf)
 	copyOfBf[byteIndex] |= 1 << (7 - offset)
