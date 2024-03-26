@@ -38,7 +38,7 @@ func (cs *CurrentStatus) Update(piece *message.Piece) error {
 }
 
 func (cs *CurrentStatus) readMessage() error {
-	msg, err := cs.Client.Read() // this call blocks
+	msg, err := message.ReadPeerMessage(cs.Client.Conn)
 	if err != nil {
 		return err
 	}
