@@ -56,8 +56,3 @@ func DecodeConnectionInfo(peerData []byte) ([]ConnectionInfo, error) {
 
 	return peers, nil
 }
-
-func (c *Client) Read() (*message.PeerMessage, error) {
-	msg, err := message.ReadPeerMessage(c.Conn)
-	return msg, err
-}
