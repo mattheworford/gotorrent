@@ -11,25 +11,28 @@ const (
 	LengthBufSize    = 4
 )
 
+// PeerMessageType represents the value of the type bit in a peer message.
 type PeerMessageType uint8
 
 const (
-	MsgChoke         PeerMessageType = iota // 0
-	MsgUnchoke                              // 1
-	MsgInterested                           // 2
-	MsgNotInterested                        // 3
-	MsgHave                                 // 4
-	MsgBitfield                             // 5
-	MsgRequest                              // 6
-	MsgPiece                                // 7
-	MsgCancel                               // 8
+	ChokeMessage         PeerMessageType = iota // 0
+	UnchokeMessage                              // 1
+	InterestedMessage                           // 2
+	NotInterestedMessage                        // 3
+	HaveMessage                                 // 4
+	BitfieldMessage                             // 5
+	RequestMessage                              // 6
+	PieceMessage                                // 7
+	CancelMessage                               // 8
 )
 
+// PeerMessage represents a non-keepalive message sent between peers.
 type PeerMessage struct {
 	Type    PeerMessageType
 	Payload []byte
 }
 
+// Serialize serializes a PeerMessage into a byte slice.
 func (m *PeerMessage) Serialize() ([]byte, error) {
 	if m == nil {
 		return make([]byte, LengthBufSize), nil
@@ -48,7 +51,8 @@ func (m *PeerMessage) Serialize() ([]byte, error) {
 	return buf, nil
 }
 
-func ParsePeerMessage(r io.Reader) (*PeerMessage, error) {
+// ReadPeerMessage reads a PeerMessage from an io.Reader.
+func ReadPeerMessage(r io.Reader) (*PeerMessage, error) {
 	lengthBuf := make([]byte, LengthBufSize)
 	_, err := io.ReadFull(r, lengthBuf)
 	if err != nil {
@@ -78,37 +82,36 @@ func ParsePeerMessage(r io.Reader) (*PeerMessage, error) {
 	return &m, nil
 }
 
-func ParsePiece(index int, buf []byte, msg *PeerMessage) (int, error) {
-	if msg.Type != MsgPiece {
-		return 0, fmt.Errorf("Expected PIECE (Type %d), got Type %d", MsgPiece, msg.Type)
-	}
-	if len(msg.Payload) < 8 {
-		return 0, fmt.Errorf("Payload too short. %d < 8", len(msg.Payload))
-	}
-	parsedIndex := int(binary.BigEndian.Uint32(msg.Payload[0:4]))
-	if parsedIndex != index {
-		return 0, fmt.Errorf("Expected index %d, got %d", index, parsedIndex)
-	}
-	begin := int(binary.BigEndian.Uint32(msg.Payload[4:8]))
-	if begin >= len(buf) {
-		return 0, fmt.Errorf("Begin offset too high. %d >= %d", begin, len(buf))
-	}
-	data := msg.Payload[8:]
-	if begin+len(data) > len(buf) {
-		return 0, fmt.Errorf("Data too long [%d] for offset %d with length %d", len(data), begin, len(buf))
-	}
-	copy(buf[begin:], data)
-	return len(data), nil
+// ParseHaveMessage parses a have message and returns the index of the piece indicated.
+func ParseHaveMessage(msg *PeerMessage) (int, error) {
+    const expectedPayloadLength = 4
+
+    if msg.Type != HaveMessage {
+        return 0, fmt.Errorf("expected piece message (type %d), but got type %d", HaveMessage, msg.Type)
+    }
+
+    if len(msg.Payload) != expectedPayloadLength {
+        return 0, fmt.Errorf("expected payload length %d, but got length %d", expectedPayloadLength, len(msg.Payload))
+    }
+
+    index := int(binary.BigEndian.Uint32(msg.Payload))
+    return index, nil
 }
 
-// ParseHave parses a HAVE message
-func ParseHave(msg *PeerMessage) (int, error) {
-	if msg.Type != MsgHave {
-		return 0, fmt.Errorf("Expected HAVE (ID %d), got ID %d", MsgHave, msg.Type)
+// ParsePieceMessage parses piece data from a peer message.
+func ParsePieceMessage(msg *PeerMessage) (*Piece, error) {
+    const minPayloadLength = 8
+
+	if msg.Type != PieceMessage {
+		return nil, fmt.Errorf("expected piece message (type %d), but got type %d", PieceMessage, msg.Type)
 	}
-	if len(msg.Payload) != 4 {
-		return 0, fmt.Errorf("Expected payload length 4, got length %d", len(msg.Payload))
+	if len(msg.Payload) < minPayloadLength {
+		return nil, fmt.Errorf("minimum payload length %d, but got length %d", minPayloadLength, len(msg.Payload))
 	}
-	index := int(binary.BigEndian.Uint32(msg.Payload))
-	return index, nil
+
+	index := int(binary.BigEndian.Uint32(msg.Payload[0:4]))
+	offset := int(binary.BigEndian.Uint32(msg.Payload[4:8]))
+	data := msg.Payload[8:]
+
+	return &Piece{Data: data, Index: index, Offset: offset}, nil
 }
