@@ -77,3 +77,38 @@ func ParsePeerMessage(r io.Reader) (*PeerMessage, error) {
 
 	return &m, nil
 }
+
+func ParsePiece(index int, buf []byte, msg *PeerMessage) (int, error) {
+	if msg.Type != MsgPiece {
+		return 0, fmt.Errorf("Expected PIECE (Type %d), got Type %d", MsgPiece, msg.Type)
+	}
+	if len(msg.Payload) < 8 {
+		return 0, fmt.Errorf("Payload too short. %d < 8", len(msg.Payload))
+	}
+	parsedIndex := int(binary.BigEndian.Uint32(msg.Payload[0:4]))
+	if parsedIndex != index {
+		return 0, fmt.Errorf("Expected index %d, got %d", index, parsedIndex)
+	}
+	begin := int(binary.BigEndian.Uint32(msg.Payload[4:8]))
+	if begin >= len(buf) {
+		return 0, fmt.Errorf("Begin offset too high. %d >= %d", begin, len(buf))
+	}
+	data := msg.Payload[8:]
+	if begin+len(data) > len(buf) {
+		return 0, fmt.Errorf("Data too long [%d] for offset %d with length %d", len(data), begin, len(buf))
+	}
+	copy(buf[begin:], data)
+	return len(data), nil
+}
+
+// ParseHave parses a HAVE message
+func ParseHave(msg *PeerMessage) (int, error) {
+	if msg.Type != MsgHave {
+		return 0, fmt.Errorf("Expected HAVE (ID %d), got ID %d", MsgHave, msg.Type)
+	}
+	if len(msg.Payload) != 4 {
+		return 0, fmt.Errorf("Expected payload length 4, got length %d", len(msg.Payload))
+	}
+	index := int(binary.BigEndian.Uint32(msg.Payload))
+	return index, nil
+}
