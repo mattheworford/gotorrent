@@ -84,23 +84,23 @@ func ReadPeerMessage(r io.Reader) (*PeerMessage, error) {
 
 // ParseHaveMessage parses a have message and returns the index of the piece indicated.
 func ParseHaveMessage(msg *PeerMessage) (int, error) {
-    const expectedPayloadLength = 4
+	const expectedPayloadLength = 4
 
-    if msg.Type != HaveMessage {
-        return 0, fmt.Errorf("expected piece message (type %d), but got type %d", HaveMessage, msg.Type)
-    }
+	if msg.Type != HaveMessage {
+		return 0, fmt.Errorf("expected piece message (type %d), but got type %d", HaveMessage, msg.Type)
+	}
 
-    if len(msg.Payload) != expectedPayloadLength {
-        return 0, fmt.Errorf("expected payload length %d, but got length %d", expectedPayloadLength, len(msg.Payload))
-    }
+	if len(msg.Payload) != expectedPayloadLength {
+		return 0, fmt.Errorf("expected payload length %d, but got length %d", expectedPayloadLength, len(msg.Payload))
+	}
 
-    index := int(binary.BigEndian.Uint32(msg.Payload))
-    return index, nil
+	index := int(binary.BigEndian.Uint32(msg.Payload))
+	return index, nil
 }
 
 // ParsePieceMessage parses piece data from a peer message.
 func ParsePieceMessage(msg *PeerMessage) (*Piece, error) {
-    const minPayloadLength = 8
+	const minPayloadLength = 8
 
 	if msg.Type != PieceMessage {
 		return nil, fmt.Errorf("expected piece message (type %d), but got type %d", PieceMessage, msg.Type)
