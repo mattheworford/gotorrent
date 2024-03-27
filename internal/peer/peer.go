@@ -19,6 +19,7 @@ type ConnectionInfo struct {
 	Port uint16
 }
 
+// Client represents a peer client.
 type Client struct {
 	Conn           net.Conn
 	Choked         bool
@@ -54,9 +55,4 @@ func DecodeConnectionInfo(peerData []byte) ([]ConnectionInfo, error) {
 	}
 
 	return peers, nil
-}
-
-func (c *Client) Read() (*message.PeerMessage, error) {
-	msg, err := message.ParsePeerMessage(c.Conn)
-	return msg, err
 }

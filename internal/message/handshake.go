@@ -11,13 +11,14 @@ const (
 	ReservedBufSize = 8
 )
 
+// Handshake represents a handshake message.
 type Handshake struct {
 	ProtocolString string
 	InfoHash       [InfoHashLength]byte
 	PeerID         [PeerIDLength]byte
 }
 
-// NewHandshake creates a new Handshake message.
+// NewHandshake creates a new Handshake with the given info hash and peer ID.
 func NewHandshake(infoHash [InfoHashLength]byte, peerID [PeerIDLength]byte) *Handshake {
 	return &Handshake{
 		ProtocolString: "BitTorrent protocol",
@@ -26,7 +27,7 @@ func NewHandshake(infoHash [InfoHashLength]byte, peerID [PeerIDLength]byte) *Han
 	}
 }
 
-// Serialize serializes the Handshake message into a byte slice.
+// Serialize serializes a Handshake into a byte slice.
 func (h *Handshake) Serialize() []byte {
 	buf := make([]byte, len(h.ProtocolString)+49)
 	buf[0] = byte(len(h.ProtocolString))
@@ -38,8 +39,8 @@ func (h *Handshake) Serialize() []byte {
 	return buf
 }
 
-// ParseHandshake parses a Handshake message from an io.Reader.
-func ParseHandshake(r io.Reader) (*Handshake, error) {
+// ReadHandshake parses a Handshake from an io.Reader.
+func ReadHandshake(r io.Reader) (*Handshake, error) {
 	protocolStringLenBuf := make([]byte, 1)
 	_, err := r.Read(protocolStringLenBuf)
 	if err != nil {

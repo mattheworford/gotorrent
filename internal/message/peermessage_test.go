@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestParsePeerMessage(t *testing.T) {
+func TestReadPeerMessage(t *testing.T) {
 	testCases := []struct {
 		name          string
 		reader        io.Reader
@@ -51,7 +51,7 @@ func TestParsePeerMessage(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			message, err := ParsePeerMessage(tc.reader)
+			message, err := ReadPeerMessage(tc.reader)
 
 			if tc.expectErr {
 				if err == nil {
